@@ -32,6 +32,25 @@ bread_router.delete('/:indexArray', (req, res) => {
   res.status(303).redirect('/breads')
 })
 
+// UPDATE
+bread_router.put('/:arrayIndex', (req, res) => {
+  if(req.body.hasGluten === 'on'){
+    req.body.hasGluten = true
+  } else {
+    req.body.hasGluten = false
+  }
+  bread_data[req.params.arrayIndex] = req.body
+  res.redirect(`/breads/${req.params.arrayIndex}`)
+})
+
+// EDIT
+bread_router.get('/:indexArray/edit', (req, res) => {
+  res.render('edit', {
+    bread: bread_data[req.params.indexArray],
+    index: req.params.indexArray,
+  })
+})
+
 
 // CREATE
 bread_router.post('/', (req, res) => {
