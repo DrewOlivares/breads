@@ -19,11 +19,19 @@ bread_router.get('/new', (req, res) => {
 bread_router.get('/:arrayIndex', (req, res) => {
   if ( bread_data[req.params.arrayIndex]) {
     res.render('Show', {
-      bread: bread_data[req.params.arrayIndex]
+      bread: bread_data[req.params.arrayIndex],
+      index: req.params.arrayIndex,
     })
   } else {
     res.send('404')}
 })
+
+// DELETE
+bread_router.delete('/:indexArray', (req, res) => {
+  bread_data.splice(req.params.indexArray, 1)
+  res.status(303).redirect('/breads')
+})
+
 
 // CREATE
 bread_router.post('/', (req, res) => {
