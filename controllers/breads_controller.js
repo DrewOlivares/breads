@@ -1,12 +1,17 @@
 const express = require('express')
 const bread_router = express.Router()
-const bread_data = require('../models/bread.js')
+const Bread = require('../models/bread.js')
 
 // INDEX
 bread_router.get('/', (req, res) => {
-    res.render('index', {
-      "breads": bread_data
+  Bread.find().then(foundBreads =>{
+      res.render('index', {
+        breads: foundBreads
+      })
     })
+    // res.render('index', {
+    //   breads: Bread
+    // })
   // res.send(Bread)
 })
 
@@ -16,19 +21,21 @@ bread_router.get('/new', (req, res) => {
 })
 
 // SHOW
-bread_router.get('/:arrayIndex', (req, res) => {
-  if ( bread_data[req.params.arrayIndex]) {
-    res.render('Show', {
-      bread: bread_data[req.params.arrayIndex],
-      index: req.params.arrayIndex,
-    })
-  } else {
-    res.send('404')}
+bread_router.get('/:id', (req, res) => {
+  Bread.findById(req.params.id)
+      .then(foundBread => {
+          res.render('show', {
+              bread: foundBread
+          })
+      }).catch(err => {
+        res.status(404).render('error404')
+      })
 })
+
 
 // DELETE
 bread_router.delete('/:indexArray', (req, res) => {
-  bread_data.splice(req.params.indexArray, 1)
+  Bread.splice(req.params.indexArray, 1)
   res.status(303).redirect('/breads')
 })
 
@@ -39,14 +46,14 @@ bread_router.put('/:arrayIndex', (req, res) => {
   } else {
     req.body.hasGluten = false
   }
-  bread_data[req.params.arrayIndex] = req.body
+  Bread[req.params.arrayIndex] = req.body
   res.redirect(`/breads/${req.params.arrayIndex}`)
 })
 
 // EDIT
 bread_router.get('/:indexArray/edit', (req, res) => {
   res.render('edit', {
-    bread: bread_data[req.params.indexArray],
+    bread: Bread[req.params.indexArray],
     index: req.params.indexArray,
   })
 })
@@ -55,14 +62,14 @@ bread_router.get('/:indexArray/edit', (req, res) => {
 // CREATE
 bread_router.post('/', (req, res) => {
   if (!req.body.image) {
-    req.body.image = 'https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
+    req.body.image = undefined
   }
   if(req.body.hasGluten === 'on') {
     req.body.hasGluten = 'true'
   } else {
     req.body.hasGluten = 'false'
   }
-  bread_data.push(req.body)
+  Bread.create(req.body)
   res.redirect('/breads')
 })
 
