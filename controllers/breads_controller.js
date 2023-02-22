@@ -34,27 +34,34 @@ bread_router.get('/:id', (req, res) => {
 
 
 // DELETE
-bread_router.delete('/:indexArray', (req, res) => {
-  Bread.splice(req.params.indexArray, 1)
-  res.status(303).redirect('/breads')
+bread_router.delete('/:id', (req, res) => {
+  Bread.findByIdAndDelete(req.params.id) 
+    .then(deletedBread => { 
+      res.status(303).redirect('/breads')
+    })
 })
 
+
 // UPDATE
-bread_router.put('/:arrayIndex', (req, res) => {
+bread_router.put('/:id', (req, res) => {
   if(req.body.hasGluten === 'on'){
     req.body.hasGluten = true
   } else {
     req.body.hasGluten = false
   }
-  Bread[req.params.arrayIndex] = req.body
-  res.redirect(`/breads/${req.params.arrayIndex}`)
+  Bread.findByIdAndUpdate(req.params.id, req.body, {new: true})
+  .then(updatedBread => {
+  res.redirect(`/breads/${req.params.id}`)
+  })
 })
 
 // EDIT
-bread_router.get('/:indexArray/edit', (req, res) => {
-  res.render('edit', {
-    bread: Bread[req.params.indexArray],
-    index: req.params.indexArray,
+bread_router.get('/:id/edit', (req, res) => {
+  Bread.findById(req.params.id)
+  .then(foundBread => {
+    res.render('edit', {
+    bread: foundBread,
+    })
   })
 })
 
