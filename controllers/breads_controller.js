@@ -2,13 +2,19 @@ const express = require('express')
 const Baker = require('../models/baker.js')
 const bread_router = express.Router()
 const Bread = require('../models/bread.js')
+const baker = require('./bakers_controller.js')
 
 // INDEX
 bread_router.get('/', (req, res) => {
-  Bread.find().then(foundBreads =>{
-      res.render('index', {
-        breads: foundBreads
-      })
+  Baker.find()
+    .then(foundBakers => {
+      Bread.find()
+        .then(foundBreads =>{
+          res.render('index', {
+            breads: foundBreads,
+            bakers: foundBakers
+          })
+        })
     })
 })
 
@@ -88,7 +94,7 @@ bread_router.post('/', (req, res) => {
 
 //seed
 bread_router.get('/data/seed', (req, res) => {
-  Bread.insertMany([
+      Bread.insertMany([
     {
       name: 'Rye',
       hasGluten: true,
@@ -109,11 +115,10 @@ bread_router.get('/data/seed', (req, res) => {
       hasGluten: true,
       image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1050&q=80',
     }
-  ])
-    .then(createdBreads => {
-      res.redirect('/breads')
+      ])
+        .then(createdBreads => {
+          res.redirect('/breads')
+        })
     })
-})
-
 
 module.exports = bread_router
