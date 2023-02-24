@@ -1,4 +1,5 @@
 const express = require('express')
+const Baker = require('../models/baker.js')
 const bread_router = express.Router()
 const Bread = require('../models/bread.js')
 
@@ -13,12 +14,18 @@ bread_router.get('/', (req, res) => {
 
 // NEW
 bread_router.get('/new', (req, res) => {
-  res.render('new')
+  Baker.find()
+  .then(foundBakers => {
+    res.render('new', {
+      bakers: foundBakers
+    })
+  })
 })
 
 // SHOW
 bread_router.get('/:id', (req, res) => {
   Bread.findById(req.params.id)
+    .populate('baker')
       .then(foundBread => {
         const bakedBy = foundBread.getBakedBy();
         res.render('show', {
@@ -30,7 +37,6 @@ bread_router.get('/:id', (req, res) => {
       })
 })
 
-
 // DELETE
 bread_router.delete('/:id', (req, res) => {
   Bread.findByIdAndDelete(req.params.id) 
@@ -38,7 +44,6 @@ bread_router.delete('/:id', (req, res) => {
       res.status(303).redirect('/breads')
     })
 })
-
 
 // UPDATE
 bread_router.put('/:id', (req, res) => {
@@ -55,14 +60,17 @@ bread_router.put('/:id', (req, res) => {
 
 // EDIT
 bread_router.get('/:id/edit', (req, res) => {
-  Bread.findById(req.params.id)
-  .then(foundBread => {
-    res.render('edit', {
-    bread: foundBread,
+  Baker.find()
+    .then(foundBakers => {
+      Bread.findById(req.params.id)
+        .then(foundBread => {
+          res.render('edit', {
+          bread: foundBread,
+          bakers: foundBakers
+        })
     })
   })
 })
-
 
 // CREATE
 bread_router.post('/', (req, res) => {
@@ -79,7 +87,7 @@ bread_router.post('/', (req, res) => {
 })
 
 //seed
-/* bread_router.get('/data/seed', (req, res) => {
+bread_router.get('/data/seed', (req, res) => {
   Bread.insertMany([
     {
       name: 'Rye',
@@ -105,7 +113,7 @@ bread_router.post('/', (req, res) => {
     .then(createdBreads => {
       res.redirect('/breads')
     })
-}) */
+})
 
 
 module.exports = bread_router
