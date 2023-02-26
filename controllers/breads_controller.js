@@ -5,16 +5,12 @@ const Bread = require('../models/bread.js')
 const baker = require('./bakers_controller.js')
 
 // INDEX
-bread_router.get('/', (req, res) => {
-  Baker.find()
-    .then(foundBakers => {
-      Bread.find()
-        .then(foundBreads =>{
-          res.render('index', {
-            breads: foundBreads,
-            bakers: foundBakers
-          })
-        })
+bread_router.get('/', async (req, res) => {
+  const foundBreads = await Bread.find().limit(5).lean()
+  const foundBakers = await Baker.find().lean()
+    res.render('index', {
+      breads: foundBreads,
+      bakers: foundBakers
     })
 })
 
